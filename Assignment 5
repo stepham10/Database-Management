@@ -1,0 +1,27 @@
+--Assignmnet 5
+--1
+SELECT * FROM consultant 
+	START WITH ID = 'JR01' 
+		CONNECT BY PRIOR ID = REPTS_TO;
+--2
+SELECT * FROM consultant 
+	START WITH ID = 'JR01' 
+		CONNECT BY ID = PRIOR REPTS_TO;
+--3
+SELECT level, LPAD(' ', 2*(LEVEL-1))||NAME "Consultant Name"
+	FROM consultant 
+		START WITH ID = 'JR01' 
+			CONNECT BY ID = PRIOR REPTS_TO;
+--4
+SELECT DECODE (GROUPING (PRODUCT), 1, 'All Groups Total', PRODUCT) "product_name", SUM(UNITS_SOLD)
+	FROM monthly_sales 
+		GROUP BY ROLLUP(PRODUCT);
+--5
+SELECT product, SUM(UNITS_SOLD), RANK() OVER (ORDER BY SUM(units_sold) DESC) RANK
+	FROM monthly_sales 
+		GROUP BY PRODUCT;
+--6
+SELECT product, SUM(units_sold) 
+	FROM monthly_sales
+		GROUP BY GROUPING SETS (product)
+          		ORDER BY SUM(units_sold) DESC;
