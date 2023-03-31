@@ -1,0 +1,81 @@
+--SQL Project Part One 
+--1,
+SELECT * FROM passenger 
+	ORDER BY pas_name, pas_fare; 
+
+--2,
+SELECT DISTINCT pil_pilotname, pil_state, pil_city, pil_zip, pil_flight_pay FROM pilots
+	WHERE pil_flight_pay >2500 
+    		AND (pil_city = 'HOUSTON' OR pil_city = 'PHOENIX')
+        		ORDER BY pil_zip DESC; 
+--3,
+SELECT DISTINCT pil_pilotname, pil_state, pil_city, pil_zip, pil_flight_pay FROM pilots
+	WHERE pil_city IN ('HOUSTON','PHOENIX') 
+    		AND pil_flight_pay >2500
+        		ORDER BY pil_zip DESC;
+--4,
+SELECT pil_pilotname, pil_state, pil_city, pil_zip, pil_flight_pay FROM pilots
+    WHERE pil_city = 'HOUSTON' 
+        AND pil_flight_pay >2500
+UNION 
+SELECT pil_pilotname, pil_state, pil_city, pil_zip, pil_flight_pay FROM pilots
+    WHERE pil_city = 'PHOENIX' 
+        AND pil_flight_pay >2500
+    ORDER BY pil_zip DESC;
+--5,
+SELECT * FROM equip_type
+    WHERE eq_seat_capacity < 280 
+	OR (eq_miles_per_gal > 4.0 AND eq_fuel_capacity < 2000);
+--6,
+SELECT * FROM equip_type 
+	WHERE eq_seat_capacity < 280 
+UNION 
+SELECT * FROM equip_type
+	WHERE eq_miles_per_gal > 4.0 AND eq_fuel_capacity < 2000;
+--7,
+SELECT * FROM airport 
+	WHERE air_location LIKE 'L%';
+--8,
+SELECT COUNT (dep_pilot_id), dep_pilot_id FROM departures 
+    GROUP BY dep_pilot_id
+        HAVING COUNT (dep_pilot_id) > 20
+            ORDER BY dep_pilot_id; 
+--9,
+ALTER TABLE flight 
+	RENAME COLUMN fl_flight_no TO Flight_Number;
+ALTER TABLE flight 
+	RENAME COLUMN fl_fare TO Fare;
+ALTER TABLE flight 
+	RENAME COLUMN fl_distance TO Distance;
+SELECT flight_number, fare, distance, ROUND(distance/fare,2) AS  Miles_Flown_Per_Dollar 
+    FROM flight 
+        WHERE ROUND (distance/fare,2) > 5.50 
+            ORDER BY Miles_Flown_Per_Dollar;
+--10,
+SELECT airport.air_location, COUNT (flight.fl_dest) AS Number_of_Departing_Flights
+	FROM flight 
+		INNER JOIN airport ON flight.fl_dest=airport.air_code
+			GROUP BY air_location;
+				
+--11,
+ALTER TABLE pilots 
+    RENAME COLUMN pil_state TO State;
+SELECT state, MAX(pil_flight_pay) AS Max_Pay, MIN(pil_flight_pay) AS Min_Pay, AVG(pil_flight_pay) AS Avg_Pay
+	FROM pilots 
+		GROUP BY state;
+--12,
+SELECT pilots.pil_pilotname, MIN(departures.dep_dep_date) AS First_Departure 
+	FROM departures 
+		LEFT JOIN pilots ON departures.dep_pilot_id=pilots.pil_pilot_id 
+			GROUP BY pil_pilotname 
+    		          ORDER BY pil_pilotname;
+--13,
+SELECT eq_equip_type, SUM(eq_fuel_capacity) AS Maximum_Distance_Flown 
+    FROM equip_type
+        GROUP BY eq_equip_type
+            ORDER BY eq_equip_type;
+
+--14,
+SELECT fl_orig, COUNT (fl_orig) AS number_of_flights
+    FROM flight
+        GROUP BY fl_orig;
