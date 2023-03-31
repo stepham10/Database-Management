@@ -1,0 +1,46 @@
+--SQL Project Part Two
+--1,
+SELECT flight_number, fl_orig, fl_dest 
+	FROM flight 
+		INNER JOIN airport ON flight.fl_orig=airport.air_code
+			WHERE air_hub_airline IS NULL OR air_hub_airline = 'American';
+--2,
+SELECT dep_flight_no, dep_dep_date, equip_type.eq_equip_type
+	FROM departures 
+		INNER JOIN equip_type ON departures.dep_equip_no=equip_type.eq_equip_no
+			WHERE eq_equip_type LIKE '%CON%' 
+             		 ORDER BY dep_dep_date;
+--3,
+SELECT pil_pilot_id, pil_pilotname
+    FROM pilots 
+        WHERE pil_pilot_id 
+            NOT IN (SELECT dep_pilot_id FROM departures);
+--4, 
+SELECT pil_pilot_id, pil_pilotname 
+	FROM pilots 
+		LEFT OUTER JOIN departures ON pilots.pil_pilot_id=departures.dep_pilot_id
+			WHERE departures.dep_dep_date IS NULL;
+--5, 
+SELECT pas_name, ticket.tic_seat AS "Seat Number" 
+    FROM passenger 
+        INNER JOIN ticket ON passenger.pas_itinerary_no=ticket.tic_itinerary_no
+            WHERE tic_flight_no = 101 AND tic_flight_date = '15-JUL-17'
+                ORDER BY "Seat Number";
+--6,
+SELECT departures.dep_flight_no AS "Flight Number", departures.dep_dep_date AS "Date", COUNT (passenger.pas_name) AS "Number of Passenger" 
+	FROM departures 
+		INNER JOIN ticket ON departures.dep_flight_no=ticket.tic_flight_no
+		INNER JOIN passenger ON ticket.tic_itinerary_no = passenger.pas_itinerary_no
+         		GROUP BY departures.dep_flight_no
+				HAVING COUNT (pasenger.pas_name) > 5;
+--7, 
+SELECT flight_number, fl_orig, fl_dest
+    FROM flight
+        INNER JOIN reservation ON flight.flight_number=reservation.res_flight_no
+            WHERE reservation.res_name = 'Andy Anderson';
+--8, 
+SELECT fl_orig AS "Departs From", fl_dest AS "Arrives At", MIN (flight.fare) AS "Minimum Fare"
+	FROM flight, airport a, airport b 
+		INNER JOIN airport ON flight.fl_orig=airport.air_code 
+		INNER JOIN airport ON flight.fl_dest=airport.air_code
+			WHERE fl_orig=a.air_code AND fl_dest=air_code;
